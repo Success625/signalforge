@@ -83,7 +83,7 @@ _Note: Future architecture will incorporate a Hono API and a Next.js frontend to
 ## Built With
 
 - [Birdeye Data API](https://bds.birdeye.so) — onchain data infrastructure
-- [Anthropic Claude](https://anthropic.com) — AI signal explanation
+- [Google Gemini](https://aistudio.google.com/) — AI signal explanation
 - [Telegram Bot API](https://core.telegram.org/bots/api) — signal delivery
 - [Railway](https://railway.app) — free hosting
 
