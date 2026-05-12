@@ -3,7 +3,7 @@ import cron from "node-cron";
 import { refreshWallets, getTrackedWallets } from "./wallets.js";
 import { fetchNewSwaps } from "./monitor.js";
 import { processSignal } from "./signal.js";
-import { sendSignal, sendStartupMessage } from "./telegram.js";
+import { sendLeaderboard, sendSignal, sendStartupMessage } from "./telegram.js";
 
 // Pause helper for rate limiting
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -18,28 +18,34 @@ async function runMonitorCycle() {
 
   console.log(`[index] Checking ${wallets.length} wallets for new swaps...`);
 
-  for (const wallet of wallets) {
-    try {
-      const swaps = await fetchNewSwaps(wallet);
+  const walletEntries = wallets.map((wallet) =>
+    typeof wallet === "string" ? { address: wallet } : wallet,
+  );
 
-      for (const swap of swaps) {
-        const signal = await processSignal(swap);
+  await Promise.allSettled(
+    walletEntries.map(async (wallet) => {
+      const walletAddress = wallet.address;
 
-        if (signal) {
-          await sendSignal(signal);
-          console.log(
-            `[index] Signal fired: ${signal.tokenSymbol} | $${Math.round(signal.volumeUsd).toLocaleString()}`,
-          );
+      try {
+        const swaps = await fetchNewSwaps(walletAddress);
+
+        for (const swap of swaps) {
+          const signal = await processSignal(swap);
+
+          if (signal) {
+            await sendSignal(signal);
+            console.log(
+              `[index] Signal fired: ${signal.tokenSymbol} | $${Math.round(signal.volumeUsd).toLocaleString()}`,
+            );
+          }
+
+          await sleep(2000); // 2s between tokens — respect rate limits
         }
-
-        await sleep(2000); // 2s between tokens — respect rate limits
+      } catch (err) {
+        console.error(`[index] Error processing wallet ${walletAddress}:`, err.message);
       }
-
-      await sleep(1000); // 1s between wallets
-    } catch (err) {
-      console.error(`[index] Error processing wallet ${wallet}:`, err.message);
-    }
-  }
+    }),
+  );
 }
 
 async function main() {
@@ -58,6 +64,7 @@ async function main() {
   cron.schedule("0 */6 * * *", async () => {
     console.log("[index] Running scheduled wallet refresh...");
     await refreshWallets();
+    await sendLeaderboard(getTrackedWallets());
   });
 
   // Monitor swaps every 3 minutes

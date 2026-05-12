@@ -21,12 +21,15 @@ const IGNORE_TOKENS = new Set([
 
 export async function fetchNewSwaps(walletAddress) {
   try {
+    const lastSeenTime = lastSeen[`${walletAddress}_time`];
+
     const res = await axios.get(`${BASE_URL}/trader/txs/seek_by_time`, {
       headers,
       params: {
         address: walletAddress,
         tx_type: "swap",
-        limit: 5,
+        limit: 100,
+        ...(lastSeenTime ? { after_time: lastSeenTime } : {}),
       },
     });
 
@@ -40,15 +43,8 @@ export async function fetchNewSwaps(walletAddress) {
       return true;
     });
 
-    // Filter to only new swaps since last check
-    const lastTxHash = lastSeen[walletAddress];
-    const newItems = lastTxHash
-      ? uniqueItems.filter(
-          (item) =>
-            item.tx_hash !== lastTxHash &&
-            item.block_unix_time > (lastSeen[`${walletAddress}_time`] ?? 0),
-        )
-      : uniqueItems.slice(0, 1); // first run — only take latest to avoid spam
+    // Birdeye handles after_time filtering; only throttle first run to avoid spam
+    const newItems = lastSeenTime ? uniqueItems : uniqueItems.slice(0, 1);
 
     // Update last seen
     if (uniqueItems.length > 0) {

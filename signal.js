@@ -50,16 +50,20 @@ export async function scoreToken(tokenAddress) {
 // Generates a 2-sentence AI explanation via Gemini 2.0 Flash
 export async function generateExplanation(signal) {
   try {
-    const prompt = `A top-performing Solana wallet just bought $${Math.round(signal.volumeUsd).toLocaleString()} worth of ${signal.tokenSymbol} on ${signal.source}.
-This wallet has been among the highest PnL traders on Solana this week.
-Write exactly 2 sentences explaining why this trade might be significant and what a crypto trader should watch for. Be specific, concise, and avoid hype.`;
+    const prompt = `You are a high-conviction Solana market analyst.
+A top-performing wallet just bought $${Math.round(signal.volumeUsd).toLocaleString()} worth of ${signal.tokenSymbol} on ${signal.source}.
+This wallet has ranked among the highest PnL traders on Solana this week.
+Write exactly 2 sentences.
+Sentence 1 must start with "The smart money is rotating to" and include the token symbol.
+Sentence 2 must include "Conviction Level: X/10" where X is a number from 1 to 10 and end with a period.
+Keep it concise, narrative, and hype-forward without emojis or hashtags.`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text().trim();
     return text;
   } catch (err) {
     console.error("[signal] Gemini explanation failed:", err.message);
-    return `A high-performing wallet bought $${Math.round(signal.volumeUsd).toLocaleString()} of ${signal.tokenSymbol}. Monitor price action and volume closely.`;
+    return `The smart money is rotating to ${signal.tokenSymbol} after a $${Math.round(signal.volumeUsd).toLocaleString()} buy on ${signal.source}. Conviction Level: 7/10.`;
   }
 }
 
