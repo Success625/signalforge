@@ -4,7 +4,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)
 ![pnpm](https://img.shields.io/badge/pnpm-10.33.0-orange.svg)
 
-> **SignalForge** is an AI-powered crypto monitoring tool that identifies consistently profitable Solana wallets via Birdeye's API, monitors their moves in real-time, and delivers explained signals (what they bought, their win rates, why it might matter) to a public Telegram channel. The GPT layer makes it an actionable signal, not just a blind mirror.
+> **SignalForge** is an AI-powered crypto monitoring tool built to solve the "early meme discovery" and "smart money tracking" problem. It identifies consistently profitable Solana wallets via Birdeye's API, monitors their on-chain moves in real-time, validates the token's safety (holder concentration), and delivers explained signals to a public Telegram channel.
 
 ## Tech Stack
 
@@ -23,15 +23,26 @@
 4.  **Signal Dashboard (Upcoming):** Displays top opportunities, momentum score, risk score, and smart money score.
 5.  **Telegram Alert Bot:** Sends formatted alerts automatically to a public Telegram channel.
 
-## Architecture
+## Architecture & Technical Depth
 
-SignalForge currently runs as a standalone Node.js daemon using cron jobs to poll for changes:
+SignalForge runs as a resilient Node.js background process:
 
-1. Every 6 hours: Retrieves and refreshes the list of historically profitable wallets.
-2. Every 3 minutes: Scans the specified wallets for new swaps.
-3. Data processing stream fetching new tokens, querying the AI service for insights, and emitting curated alerts out to the Telegram Bot.
+- **State Management:** Uses **Supabase** to hydrate wallet states and `lastSeenTime` markers on boot, ensuring no signals are missed if the bot restarts.
+- **Rate Limit Handling:** Implements an intelligent `withRetry429` exponential backoff wrapper around Birdeye API calls to respect rate limits during high-concurrency wallet scanning.
+- **Pipeline:**
+  1. **Cron 1 (6h):** Retrieves/refreshes historically profitable wallets.
+  2. **Cron 2 (3m):** Scans for new swaps (`tx_type: swap`).
+  3. **Safety Layer:** Filters stablecoins, assesses token concentration (`scoreToken`), and drops low-volume noise.
+  4. **AI Insight Layer:** Feeds the curated swap into Gemini 2.0 Flash to synthesize a narrative-driven conviction alert.
 
 _Note: Future architecture will incorporate a Hono API and a Next.js frontend to visualize the signals in real-time._
+
+## 🦅 Birdeye API Integration
+
+This project heavily leverages the Birdeye Data API to surface real-time, actionable alpha. Specifically, we utilize:
+
+- **`/trader/txs/seek_by_time`**: Used to scan historical and real-time transaction data from profitable wallets. We handle exponential backoffs (429s) and bookmark the `lastSeenTime` to efficiently poll for new swaps.
+- **`/defi/v3/token/holder`**: Used in our anti-rug/safety filter. Before a signal is emitted, we check the top 10 holders. If the top 3 holders own >60% of the supply, the token is flagged as highly concentrated and the signal is dropped.
 
 ## Project Structure
 
