@@ -12,9 +12,15 @@
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.49.1",
     "axios": "^1.16.0",
     "dotenv": "^17.4.2",
-    "node-cron": "^4.2.1"
+    "drizzle-orm": "^0.45.2",
+    "node-cron": "^4.2.1",
+    "pg": "^8.20.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10"
+  }
 }
