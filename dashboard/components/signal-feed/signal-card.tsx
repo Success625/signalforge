@@ -32,7 +32,8 @@ function getSignalPresentation({
 }: Pick<SignalCardItem, "source" | "isSafe" | "isCaution">) {
   if (isSafe) {
     return {
-      cardClassName: "bg-surface-container-low border border-outline-variant",
+      cardClassName: "bg-surface-container-low",
+      cardHoverBorderClassName: "hover:border-primary-container/60",
       iconWrapClassName:
         "w-12 h-12 bg-primary-container/10 border border-primary-container rounded flex items-center justify-center",
       icon: Coins,
@@ -47,7 +48,8 @@ function getSignalPresentation({
       insightIcon: Brain,
       insightIconClassName: "text-primary-container text-sm",
       insightLabel: "AI ALPHA INSIGHT",
-      insightLabelClassName: "text-[10px] font-label-md text-primary-container uppercase",
+      insightLabelClassName:
+        "text-[10px] font-label-md text-primary-container uppercase",
       explanationClassName:
         "font-ai-note text-ai-note text-on-surface-variant italic leading-relaxed",
       footerAction: (
@@ -60,28 +62,35 @@ function getSignalPresentation({
 
   if (source === "system") {
     return {
-      cardClassName:
-        "bg-error-container/10 border border-error/30 glow-border-danger",
+      cardClassName: "bg-error-container/10",
+      cardHoverBorderClassName: "hover:border-error/60",
       iconWrapClassName:
         "w-12 h-12 bg-error/10 border border-error/50 rounded flex items-center justify-center",
       icon: ShieldAlert,
       iconClassName: "text-error",
       titleClassName: "text-error",
       volumeClassName: "text-error",
-      badgeClassName: "bg-error text-on-error px-3 py-1 rounded text-[10px] font-black",
+      badgeClassName:
+        "bg-error text-on-error px-3 py-1 rounded text-[10px] font-black",
       badgeLabel: "UNSAFE",
       insightClassName: "bg-black/20 border-l-2 border-error p-4 rounded-r-lg",
       insightIcon: ShieldAlert,
       insightIconClassName: "text-error text-sm",
       insightLabel: "SYSTEM ALERT",
       insightLabelClassName: "text-[10px] font-label-md text-error uppercase",
-      explanationClassName: "font-ai-note text-ai-note text-error/90 italic leading-relaxed",
-      footerAction: <span className="text-[10px] font-label-md text-error uppercase font-bold">AUTO-BLOCKED</span>,
+      explanationClassName:
+        "font-ai-note text-ai-note text-error/90 italic leading-relaxed",
+      footerAction: (
+        <span className="text-[10px] font-label-md text-error uppercase font-bold">
+          AUTO-BLOCKED
+        </span>
+      ),
     };
   }
 
   return {
-    cardClassName: "bg-surface-container-low border border-outline-variant opacity-90",
+    cardClassName: "bg-surface-container-low opacity-90",
+    cardHoverBorderClassName: "hover:border-secondary/60",
     iconWrapClassName:
       "w-12 h-12 bg-secondary/10 border border-secondary rounded flex items-center justify-center",
     icon: ArrowLeftRight,
@@ -120,17 +129,29 @@ export function SignalCard({
   const presentation = getSignalPresentation({ source, isSafe, isCaution });
   const SignalIcon = presentation.icon;
   const InsightIcon = presentation.insightIcon;
+  const cardWidthClassName = "w-full max-w-[720px] mx-auto";
 
   return (
-    <div className={`${presentation.cardClassName} p-5 rounded-lg flex flex-col gap-3`}>
+    <div
+      className={`${presentation.cardClassName} p-5 rounded-lg flex flex-col gap-3 ${cardWidthClassName} border border-transparent ${presentation.cardHoverBorderClassName} opacity-80 hover:opacity-100 transition-all duration-300`}
+    >
       <div className="flex justify-between items-start">
         <div className="flex gap-4">
           <div className={presentation.iconWrapClassName}>
-            <SignalIcon className={presentation.iconClassName} size={20} strokeWidth={1.75} />
+            <SignalIcon
+              className={presentation.iconClassName}
+              size={20}
+              strokeWidth={1.75}
+            />
           </div>
           <div>
-            <h3 className={`font-display-lg text-lg ${presentation.titleClassName}`}>
-              {tokenName} <span className="text-on-surface-variant text-sm">({tokenSymbol})</span>
+            <h3
+              className={`font-display-lg text-lg ${presentation.titleClassName}`}
+            >
+              {tokenName}{" "}
+              <span className="text-on-surface-variant text-sm">
+                ({tokenSymbol})
+              </span>
             </h3>
             <div className={`font-data-md ${presentation.volumeClassName}`}>
               {formatUsd(volumeUsd)} {actionLabel}
@@ -138,7 +159,9 @@ export function SignalCard({
           </div>
         </div>
         <div className="flex flex-col items-end">
-          <span className={presentation.badgeClassName}>{presentation.badgeLabel}</span>
+          <span className={presentation.badgeClassName}>
+            {presentation.badgeLabel}
+          </span>
           <span className="text-[10px] font-data-sm text-on-surface-variant mt-2">
             {timestamp}
           </span>
@@ -146,8 +169,14 @@ export function SignalCard({
       </div>
       <div className={presentation.insightClassName}>
         <div className="flex items-center gap-2 mb-2">
-          <InsightIcon className={presentation.insightIconClassName} size={14} strokeWidth={1.75} />
-          <span className={presentation.insightLabelClassName}>{presentation.insightLabel}</span>
+          <InsightIcon
+            className={presentation.insightIconClassName}
+            size={14}
+            strokeWidth={1.75}
+          />
+          <span className={presentation.insightLabelClassName}>
+            {presentation.insightLabel}
+          </span>
         </div>
         <p className={presentation.explanationClassName}>{explanation}</p>
       </div>
