@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SignalForge Dashboard 🚀
+
+![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)
+![React](https://img.shields.io/badge/React-19-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg)
+![pnpm](https://img.shields.io/badge/pnpm-10-orange.svg)
+
+## Project Name and Description
+
+**SignalForge Dashboard** is the frontend UI for SignalForge, an AI-powered crypto monitoring tool. While the backend handles "early meme discovery" and "smart money tracking" via Birdeye API and Gemini AI, this Next.js dashboard visualizes that alpha in real-time. It displays top opportunities, current momentum signals, risk metrics, and smart money scores in a clean, user-friendly interface.
+
+## Technology Stack
+
+- **Next.js (App Router)** - React framework
+- **React** - UI library
+- **TypeScript** - Static typing
+- **Tailwind CSS** - Utility-first styling
+- **pnpm** - Package manager
+
+## Project Architecture
+
+The dashboard serves as the visual presentation layer for the SignalForge ecosystem. It evaluates state and interacts with the APIs to retrieve:
+
+- Top wallet opportunities
+- Narrative momentum and capital rotation tracking
+- Risk summaries (holder concentration) and conviction scores synthesized by the AI Insight Layer.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js (v18 or higher)
+- [pnpm](https://pnpm.io/installation) installed
+
+### Installation & Setup
+
+1. Navigate to the dashboard directory:
+   ```bash
+   cd dashboard
+   ```
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Run the development server:
+   ```bash
+   pnpm dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Project Structure
+
+```text
+dashboard/
+├── app/               # Next.js App Router (pages and layouts)
+│   ├── globals.css    # Global Tailwind styles
+│   ├── layout.tsx     # Root layout structure
+│   └── page.tsx       # Main dashboard entry page
+├── public/            # Static assets
+├── next.config.ts     # Next.js build configuration
+└── tsconfig.json      # TypeScript configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Signal Dashboard:** Real-time display of top opportunities.
+- **Metric Visualizations:** Momentum scores, risk scores (anti-rug metrics), and smart money scores.
+- **Narrative Tracking:** Discover trending sectors and AI meme coins.
+- **Responsive UI:** Built with Tailwind CSS for mobile and desktop compatibility.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Development Workflow
 
-## Learn More
+Active development takes place within the Next.js `app` folder, following standard component-driven design patterns. The project utilizes pnpm workspaces from the root to manage dependencies efficiently across both backend (SignalForge Node.js process) and frontend.
 
-To learn more about Next.js, take a look at the following resources:
+## Coding Standards
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Modern React Functional Components
+- TypeScript for strong typing and interface definitions
+- Tailwind CSS layout conventions
+- Standard ESLint formatting integrations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Testing
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+_Testing setup to be integrated as the application scales._
