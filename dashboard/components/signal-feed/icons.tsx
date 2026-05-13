@@ -1,0 +1,56 @@
+import {
+  Activity,
+  BellRing,
+  Brain,
+  CircleHelp,
+  Coins,
+  Flame,
+  History,
+  Plus,
+  Radar,
+  RefreshCw,
+  Settings,
+  ShieldAlert,
+  ShieldCheck,
+  SquareTerminal,
+  Trophy,
+  Users,
+  Wallet,
+  Eye,
+  Filter,
+  Zap,
+  ArrowLeftRight,
+  BarChart3,
+} from "lucide-react";
+
+import type { NavItem } from "./types";
+
+export const navIcons: Record<NavItem["icon"], typeof Activity> = {
+  feed: Activity,
+  wallet: Wallet,
+  brain: Brain,
+  alerts: BellRing,
+  history: History,
+  support: CircleHelp,
+  logs: SquareTerminal,
+};
+
+export {
+  ArrowLeftRight,
+  BarChart3,
+  Brain,
+  Coins,
+  Eye,
+  Filter,
+  Flame,
+  Plus,
+  Radar,
+  RefreshCw,
+  Settings,
+  ShieldAlert,
+  ShieldCheck,
+  Trophy,
+  Users,
+  Wallet,
+  Zap,
+};

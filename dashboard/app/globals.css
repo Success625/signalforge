@@ -1,1 +1,174 @@
 @import "tailwindcss";
+
+@theme {
+  --color-on-primary-container: #007139;
+  --color-primary-container: #00ff88;
+  --color-surface-container: #18221a;
+  --color-surface-tint: #00e479;
+  --color-secondary-fixed-dim: #b9c8de;
+  --color-secondary-fixed: #d4e4fa;
+  --color-error-container: #93000a;
+  --color-tertiary: #fffaf8;
+  --color-secondary: #b9c8de;
+  --color-on-background: #dae6d8;
+  --color-on-tertiary-fixed: #2a1700;
+  --color-inverse-surface: #dae6d8;
+  --color-primary: #f1ffef;
+  --color-secondary-container: #39485a;
+  --color-on-tertiary-container: #8a5700;
+  --color-background: #0c160e;
+  --color-on-tertiary-fixed-variant: #653e00;
+  --color-surface-container-high: #222c24;
+  --color-surface-container-highest: #2d372e;
+  --color-on-primary-fixed-variant: #005228;
+  --color-error: #ffb4ab;
+  --color-outline-variant: #3b4b3d;
+  --color-primary-fixed: #60ff99;
+  --color-on-surface: #dae6d8;
+  --color-surface-container-low: #141e16;
+  --color-on-error: #690005;
+  --color-surface-container-lowest: #071009;
+  --color-on-secondary-fixed: #0d1c2d;
+  --color-surface-dim: #0c160e;
+  --color-on-tertiary: #472a00;
+  --color-inverse-primary: #006d37;
+  --color-primary-fixed-dim: #00e479;
+  --color-on-secondary: #233143;
+  --color-on-primary: #003919;
+  --color-surface-bright: #323c32;
+  --color-tertiary-fixed-dim: #ffb95f;
+  --color-tertiary-fixed: #ffddb8;
+  --color-on-surface-variant: #b9cbb9;
+  --color-on-secondary-container: #a7b6cc;
+  --color-surface-variant: #2d372e;
+  --color-inverse-on-surface: #29332a;
+  --color-on-primary-fixed: #00210c;
+  --color-outline: #849585;
+  --color-surface: #0c160e;
+  --color-on-error-container: #ffdad6;
+  --color-on-secondary-fixed-variant: #39485a;
+  --color-tertiary-container: #ffd8ad;
+
+  --radius-default: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+
+  --font-label-md: var(--font-inter), sans-serif;
+  --font-ai-note: var(--font-inter), sans-serif;
+  --font-data-md: var(--font-jetbrains-mono), monospace;
+  --font-body-md: var(--font-inter), sans-serif;
+  --font-data-sm: var(--font-jetbrains-mono), monospace;
+  --font-display-lg: var(--font-inter), sans-serif;
+  --font-data-xl: var(--font-jetbrains-mono), monospace;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 1.2;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
+
+  --text-ai-note: 13px;
+  --text-ai-note--line-height: 1.6;
+  --text-ai-note--font-weight: 400;
+
+  --text-data-md: 14px;
+  --text-data-md--line-height: 1.4;
+  --text-data-md--letter-spacing: 0em;
+  --text-data-md--font-weight: 500;
+
+  --text-body-md: 14px;
+  --text-body-md--line-height: 1.5;
+  --text-body-md--font-weight: 400;
+
+  --text-data-sm: 11px;
+  --text-data-sm--line-height: 1.4;
+  --text-data-sm--letter-spacing: 0em;
+  --text-data-sm--font-weight: 400;
+
+  --text-display-lg: 28px;
+  --text-display-lg--line-height: 1.2;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 900;
+
+  --text-data-xl: 20px;
+  --text-data-xl--line-height: 1.1;
+  --text-data-xl--letter-spacing: -0.01em;
+  --text-data-xl--font-weight: 600;
+}
+
+@keyframes pulse-dot {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scanline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 4px, 24px 24px, 24px 24px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.glow-border-active {
+  box-shadow:
+    0 0 8px rgba(0, 255, 136, 0.4),
+    inset 0 0 4px rgba(0, 255, 136, 0.2);
+  border: 1px solid #00ff88;
+}
+
+.glow-border-danger {
+  box-shadow: 0 0 8px rgba(255, 180, 171, 0.2);
+  border: 1px solid #ffb4ab;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3b4b3d #071009;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-on-surface);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #071009;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b4b3d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00ff88;
+}
