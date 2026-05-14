@@ -1,4 +1,4 @@
-import type { NavItem, SignalCardItem, SummaryMetric, WalletItem } from "./types";
+import type { NavItem, SignalCardItem, SummaryMetric } from "./types";
 
 export const headerMetrics: SummaryMetric[] = [
   { label: "SIGNALS TODAY", value: "1,284" },
@@ -18,22 +18,6 @@ export const primaryNavItems: NavItem[] = [
 export const utilityNavItems: NavItem[] = [
   { label: "Support", href: "#", icon: "support" },
   { label: "Logs", href: "#", icon: "logs" },
-];
-
-export const trackedWallets: WalletItem[] = [
-  {
-    address: "0x7a...f4",
-    pnl24h: "+12.4%",
-    winRate: "68%",
-    isActive: true,
-    isPremium: true,
-    chartHeights: ["30%", "50%", "40%", "80%", "100%"],
-  },
-  { address: "0x3b...88", pnl24h: "+4.2%", winRate: "55%" },
-  { address: "0x92...a1", pnl24h: "-1.5%", winRate: "42%", isDimmed: true },
-  { address: "0x12...c4", pnl24h: "+31.8%", winRate: "82%" },
-  { address: "0x55...d2", pnl24h: "0.0%", winRate: "50%" },
-  { address: "0xdd...e9", pnl24h: "-8.2%", winRate: "31%", isDimmed: true },
 ];
 
 export const signalFeedItems: SignalCardItem[] = [

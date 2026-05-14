@@ -7,22 +7,32 @@ type WalletCardProps = WalletItem & {
   onSelect?: (address: string) => void;
 };
 
+function formatAddress(address: string, visibleStart = 6, visibleEnd = 4) {
+  if (address.length <= visibleStart + visibleEnd + 3) {
+    return address;
+  }
+
+  return `${address.slice(0, visibleStart)}...${address.slice(-visibleEnd)}`;
+}
+
 export function WalletCard({
   address,
-  pnl24h,
-  winRate,
+  pnlUsd,
   isActive,
   isDimmed,
   isPremium,
   chartHeights,
   onSelect,
 }: WalletCardProps) {
-  const pnlClassName = pnl24h.startsWith("-")
+  const pnlClassName = pnlUsd.startsWith("-")
     ? "text-error"
-    : pnl24h.startsWith("+")
+    : pnlUsd.startsWith("+")
       ? "text-primary-container"
       : "text-on-surface";
   const cardWidthClassName = "w-full max-w-[720px] mx-auto";
+  const linkClassName = isActive
+    ? "bg-primary-container text-on-primary px-2 py-1 rounded-full"
+    : "bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-full";
   const resolvedChartHeights = chartHeights?.length
     ? chartHeights
     : ["30%", "55%", "40%", "70%", "50%"];
@@ -46,7 +56,10 @@ export function WalletCard({
         onKeyDown={handleKeyDown}
       >
         <div className="flex justify-between items-start mb-2">
-          <span className="font-data-md text-primary-container">{address}</span>
+          <span className="font-data-md text-primary-container">
+            <span className="sm:hidden">{formatAddress(address)}</span>
+            <span className="hidden sm:inline">{address}</span>
+          </span>
           {isPremium || isActive ? (
             <Trophy
               className="text-primary-container"
@@ -56,18 +69,21 @@ export function WalletCard({
             />
           ) : null}
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
-            <div className="text-[10px] text-on-surface-variant uppercase font-label-md">
-              PnL (24h)
+            <div className="flex items-center justify-between text-[10px] text-on-surface-variant uppercase font-label-md">
+              <span>PnL (USD)</span>
+              <a
+                className={`${linkClassName} text-[9px] tracking-widest transition-colors`}
+                href={`https://birdeye.so/profile/${address}?chain=solana`}
+                rel="noopener noreferrer"
+                target="_blank"
+                aria-label="View wallet on Birdeye"
+              >
+                View on Birdeye
+              </a>
             </div>
-            <div className={`font-data-md ${pnlClassName}`}>{pnl24h}</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-on-surface-variant uppercase font-label-md">
-              Win Rate
-            </div>
-            <div className="font-data-md text-on-surface">{winRate}</div>
+            <div className={`font-data-md ${pnlClassName}`}>{pnlUsd}</div>
           </div>
         </div>
         <div
@@ -102,20 +118,26 @@ export function WalletCard({
       onKeyDown={handleKeyDown}
     >
       <div className="flex justify-between items-start mb-2">
-        <span className="font-data-md text-on-surface">{address}</span>
+        <span className="font-data-md text-on-surface">
+          <span className="sm:hidden">{formatAddress(address)}</span>
+          <span className="hidden sm:inline">{address}</span>
+        </span>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div>
-          <div className="text-[10px] text-on-surface-variant uppercase font-label-md">
-            PnL (24h)
+          <div className="flex items-center justify-between text-[10px] text-on-surface-variant uppercase font-label-md">
+            <span>PnL (USD)</span>
+            <a
+              className={`${linkClassName} text-[9px] tracking-widest transition-colors`}
+              href={`https://birdeye.so/profile/${address}?chain=solana`}
+              rel="noopener noreferrer"
+              target="_blank"
+              aria-label="View wallet on Birdeye"
+            >
+              View on Birdeye
+            </a>
           </div>
-          <div className={`font-data-md ${pnlClassName}`}>{pnl24h}</div>
-        </div>
-        <div>
-          <div className="text-[10px] text-on-surface-variant uppercase font-label-md">
-            Win Rate
-          </div>
-          <div className="font-data-md text-on-surface">{winRate}</div>
+          <div className={`font-data-md ${pnlClassName}`}>{pnlUsd}</div>
         </div>
       </div>
       <div

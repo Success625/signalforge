@@ -4,9 +4,10 @@ import type { SignalCardItem } from "./types";
 type SignalCardProps = {
   wallet: string;
   tokenSymbol: string;
+  tokenAddress?: string;
   volumeUsd: number;
   explanation: string;
-  source: "ai" | "system" | "monitoring";
+  source: "ai" | "system" | "monitoring" | "smart_money";
   timestamp: string;
   isSafe: boolean;
   concentrationPct?: number;
@@ -112,9 +113,18 @@ function getSignalPresentation({
   };
 }
 
+function formatWalletLabel(wallet: string) {
+  if (wallet === "smart-money") {
+    return "Smart Money";
+  }
+
+  return wallet;
+}
+
 export function SignalCard({
   wallet,
   tokenSymbol,
+  tokenAddress,
   volumeUsd,
   explanation,
   source,
@@ -129,7 +139,23 @@ export function SignalCard({
   const presentation = getSignalPresentation({ source, isSafe, isCaution });
   const SignalIcon = presentation.icon;
   const InsightIcon = presentation.insightIcon;
-  const cardWidthClassName = "w-full max-w-[720px] mx-auto";
+  const cardWidthClassName = "w-full max-w-180 mx-auto";
+  const tokenLink = tokenAddress
+    ? `https://birdeye.so/token/${tokenAddress}?chain=solana`
+    : null;
+  const footerAction = isSafe && tokenLink
+    ? (
+        <a
+          className="bg-primary-container text-on-primary font-label-md text-[10px] px-4 py-1.5 rounded uppercase font-bold hover:bg-primary-fixed transition-colors"
+          href={tokenLink}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Track Transaction
+        </a>
+      )
+    : presentation.footerAction;
+  const showFooter = isBlocked || isSafe;
 
   return (
     <div
@@ -180,17 +206,17 @@ export function SignalCard({
         </div>
         <p className={presentation.explanationClassName}>{explanation}</p>
       </div>
-      {isBlocked || isSafe ? (
+      {showFooter ? (
         <div className="flex justify-between items-center pt-2 border-t border-outline-variant/30">
           <div className="flex gap-4">
             <span className="text-[10px] font-data-sm text-on-surface-variant uppercase">
-              Wallet: {wallet}
+              Wallet: {formatWalletLabel(wallet)}
             </span>
             <span className="text-[10px] font-data-sm text-on-surface-variant uppercase">
               {severityLabel}
             </span>
           </div>
-          {presentation.footerAction}
+          {footerAction}
         </div>
       ) : null}
     </div>

@@ -1,4 +1,5 @@
 import "dotenv/config";
+import http from "node:http";
 import cron from "node-cron";
 import {
   refreshWallets,
@@ -19,6 +20,7 @@ import {
   upsertLastSeenMarkers,
   upsertTrackedWallets,
 } from "./supabase.js";
+import { fetchSmartMoneySignals } from "./smart-money.js";
 
 // Pause helper for rate limiting
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,6 +42,76 @@ const WALLET_DELAY_MS_SAFE =
     : 2000;
 
 let isMonitorCycleRunning = false;
+let isSmartMoneyCycleRunning = false;
+
+const API_PORT = Number.parseInt(process.env.API_PORT ?? "3001", 10);
+const API_PORT_SAFE =
+  Number.isFinite(API_PORT) && API_PORT > 0 ? API_PORT : 3001;
+const DASHBOARD_ORIGIN = process.env.DASHBOARD_ORIGIN ?? "*";
+
+function buildCorsHeaders() {
+  const headers = {
+    "Access-Control-Allow-Methods": "GET,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
+  if (DASHBOARD_ORIGIN === "*") {
+    return {
+      ...headers,
+      "Access-Control-Allow-Origin": "*",
+    };
+  }
+
+  return {
+    ...headers,
+    "Access-Control-Allow-Origin": DASHBOARD_ORIGIN,
+    Vary: "Origin",
+  };
+}
+
+function startApiServer() {
+  const server = http.createServer((req, res) => {
+    const corsHeaders = buildCorsHeaders();
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      res.setHeader(key, value);
+    });
+
+    if (req.method === "OPTIONS") {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    const baseUrl = `http://${req.headers.host ?? "localhost"}`;
+    const url = new URL(req.url ?? "/", baseUrl);
+
+    if (req.method === "GET" && url.pathname === "/api/tracked-wallets") {
+      const walletEntries = getTrackedWallets();
+      const payload = walletEntries.map((wallet) => {
+        if (typeof wallet === "string") {
+          return { address: wallet, pnl: null, tradeCount: null };
+        }
+
+        return {
+          address: wallet.address,
+          pnl: wallet.pnl ?? null,
+          tradeCount: wallet.tradeCount ?? null,
+        };
+      });
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(payload));
+      return;
+    }
+
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Not Found" }));
+  });
+
+  server.listen(API_PORT_SAFE, () => {
+    console.log(`[index] API server listening on ${API_PORT_SAFE}`);
+  });
+}
 
 async function hydrateFromSupabase() {
   const [wallets, markers] = await Promise.all([
@@ -144,6 +216,33 @@ async function runMonitorCycle() {
   }
 }
 
+async function runSmartMoneyCycle() {
+  if (isSmartMoneyCycleRunning) {
+    console.warn(
+      "[index] Smart-money cycle overlap detected; skipping this run",
+    );
+    return;
+  }
+
+  isSmartMoneyCycleRunning = true;
+
+  try {
+    const signals = await fetchSmartMoneySignals();
+
+    if (signals.length === 0) {
+      console.log("[index] No smart-money signals returned");
+      return;
+    }
+
+    await insertSignals(signals);
+    console.log(`[index] Stored ${signals.length} smart-money signals`);
+  } catch (err) {
+    console.error("[index] Smart-money cycle failed:", err.message ?? err);
+  } finally {
+    isSmartMoneyCycleRunning = false;
+  }
+}
+
 async function main() {
   console.log("[index] Smart Wallet Signal Feed starting...");
 
@@ -159,6 +258,9 @@ async function main() {
   // Run first monitor cycle immediately
   await runMonitorCycle();
 
+  // Run smart-money cycle immediately
+  await runSmartMoneyCycle();
+
   // Refresh wallet list every 6 hours
   cron.schedule("0 */6 * * *", async () => {
     console.log("[index] Running scheduled wallet refresh...");
@@ -173,7 +275,14 @@ async function main() {
     await runMonitorCycle();
   });
 
+  // Pull smart-money token list every 5 minutes
+  cron.schedule("*/5 * * * *", async () => {
+    console.log("[index] Running scheduled smart-money cycle...");
+    await runSmartMoneyCycle();
+  });
+
   console.log("[index] Cron jobs scheduled. Bot is running.");
 }
 
+startApiServer();
 main();

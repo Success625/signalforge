@@ -1,7 +1,7 @@
 export type WalletItem = {
   address: string;
-  pnl24h: string;
-  winRate: string;
+  pnlUsd: string;
+  tradeCount?: number;
   isActive?: boolean;
   isDimmed?: boolean;
   isPremium?: boolean;
@@ -11,10 +11,11 @@ export type WalletItem = {
 export type SignalCardItem = {
   tokenName: string;
   tokenSymbol: string;
+  tokenAddress?: string;
   volumeUsd: number;
   actionLabel: string;
   explanation: string;
-  source: "ai" | "system" | "monitoring";
+  source: "ai" | "system" | "monitoring" | "smart_money";
   timestampLabel: string;
   wallet: string;
   severityLabel: string;
