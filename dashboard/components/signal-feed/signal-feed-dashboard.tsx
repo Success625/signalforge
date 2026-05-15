@@ -270,9 +270,9 @@ function LiveSignalFeedPanel({
             No signals available yet.
           </div>
         ) : (
-          signals.map((signal) => (
+          signals.map((signal, index) => (
             <SignalCard
-              key={`${signal.tokenSymbol}-${signal.timestampLabel}`}
+              key={`${signal.tokenSymbol}-${signal.timestampLabel}-${signal.wallet || index}`}
               wallet={signal.wallet}
               tokenSymbol={signal.tokenSymbol}
               tokenAddress={signal.tokenAddress}
