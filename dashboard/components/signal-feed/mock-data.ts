@@ -8,16 +8,16 @@ export const headerMetrics: SummaryMetric[] = [
 ];
 
 export const primaryNavItems: NavItem[] = [
-  { label: "Live Feed", href: "#", icon: "feed", active: true },
-  { label: "Wallets", href: "#", icon: "wallet" },
-  { label: "Alpha AI", href: "#", icon: "brain" },
-  { label: "Alerts", href: "#", icon: "alerts" },
-  { label: "History", href: "#", icon: "history" },
+  { label: "Live Feed", href: "/", icon: "feed" },
+  // { label: "Wallets", href: "#", icon: "wallet" },
+  // { label: "Alpha AI", href: "#", icon: "brain" },
+  { label: "Alerts", href: "/alerts", icon: "alerts" },
+  // { label: "History", href: "#", icon: "history" },
 ];
 
 export const utilityNavItems: NavItem[] = [
   { label: "Support", href: "#", icon: "support" },
-  { label: "Logs", href: "#", icon: "logs" },
+  // { label: "Logs", href: "#", icon: "logs" },
 ];
 
 export const signalFeedItems: SignalCardItem[] = [

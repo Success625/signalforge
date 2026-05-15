@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import AppLayout from "@/components/AppLayout";
 
 import "./globals.css";
 
@@ -29,7 +30,9 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetBrainsMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-body-md">{children}</body>
+      <body className="min-h-full flex flex-col font-body-md">
+        <AppLayout>{children}</AppLayout>
+      </body>
     </html>
   );
 }

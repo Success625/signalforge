@@ -21,6 +21,7 @@ import {
   upsertTrackedWallets,
 } from "./supabase.js";
 import { fetchSmartMoneySignals } from "./smart-money.js";
+import { generateWalletInsights, getCachedInsights } from "./insights.js";
 
 // Pause helper for rate limiting
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -101,6 +102,13 @@ function startApiServer() {
 
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify(payload));
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/wallet-insights") {
+      const insights = getCachedInsights();
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(insights));
       return;
     }
 
@@ -251,6 +259,9 @@ async function main() {
   // Load wallets immediately on boot
   const refreshedWallets = await refreshWallets();
   await upsertTrackedWallets(refreshedWallets);
+  
+  // Generate initial insights
+  await generateWalletInsights(getTrackedWallets());
 
   // Send startup ping to Telegram
   await sendStartupMessage();
@@ -266,6 +277,7 @@ async function main() {
     console.log("[index] Running scheduled wallet refresh...");
     const updatedWallets = await refreshWallets();
     await upsertTrackedWallets(updatedWallets);
+    await generateWalletInsights(getTrackedWallets());
     await sendLeaderboard(getTrackedWallets());
   });
 

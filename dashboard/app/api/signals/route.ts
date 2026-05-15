@@ -43,43 +43,64 @@ async function fetchSmartMoneyFallback() {
   url.searchParams.set("sort_type", "desc");
   url.searchParams.set("limit", "10");
 
-  const response = await fetch(url.toString(), { headers, cache: "no-store" });
+  try {
+    const response = await fetch(url.toString(), { headers, cache: "no-store" });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return [];
+    }
+
+    const payload = await response.json();
+    const items = payload?.data ?? [];
+    const nowUnix = Math.floor(Date.now() / 1000);
+
+    return items
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((item: any) => item?.token && item?.symbol)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((item: any) => {
+        const netFlow = Number(item?.net_flow ?? 0);
+        const volumeUsd = Number(item?.volume_usd ?? 0);
+        const measuredVolume = Number.isFinite(volumeUsd)
+          ? volumeUsd
+          : Number.isFinite(netFlow)
+            ? netFlow
+            : 0;
+        const traderCount = Number(item?.smart_traders_no ?? 0);
+        const tokenLabel = item?.name
+          ? `${item.name} (${item.symbol})`
+          : item.symbol;
+
+        return {
+          wallet: "smart-money",
+          token_symbol: item.symbol,
+          token_address: item.token,
+          volume_usd: Math.abs(measuredVolume),
+          tx_hash: null,
+          source: `smart_money:${item?.trader_style ?? "all"}`,
+          timestamp: nowUnix,
+          explanation: `Smart money is rotating into ${tokenLabel}. Net flow ${formatUsd(netFlow)} with ${traderCount} traders over 1d.`,
+          created_at: new Date().toISOString(),
+        };
+      });
+  } catch (err) {
+    console.error("fetchSmartMoneyFallback error:", err);
     return [];
   }
+}
 
-  const payload = await response.json();
-  const items = payload?.data ?? [];
-  const nowUnix = Math.floor(Date.now() / 1000);
-
-  return items
-    .filter((item: any) => item?.token && item?.symbol)
-    .map((item: any) => {
-      const netFlow = Number(item?.net_flow ?? 0);
-      const volumeUsd = Number(item?.volume_usd ?? 0);
-      const measuredVolume = Number.isFinite(volumeUsd)
-        ? volumeUsd
-        : Number.isFinite(netFlow)
-          ? netFlow
-          : 0;
-      const traderCount = Number(item?.smart_traders_no ?? 0);
-      const tokenLabel = item?.name
-        ? `${item.name} (${item.symbol})`
-        : item.symbol;
-
-      return {
-        wallet: "smart-money",
-        token_symbol: item.symbol,
-        token_address: item.token,
-        volume_usd: Math.abs(measuredVolume),
-        tx_hash: null,
-        source: `smart_money:${item?.trader_style ?? "all"}`,
-        timestamp: nowUnix,
-        explanation: `Smart money is rotating into ${tokenLabel}. Net flow ${formatUsd(netFlow)} with ${traderCount} traders over 1d.`,
-        created_at: new Date().toISOString(),
-      };
-    });
+async function fetchWalletsFallback() {
+  try {
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    const response = await fetch(`${apiBaseUrl}/api/wallet-insights`, { cache: "no-store" });
+    if (!response.ok) return [];
+    
+    const insights = await response.json();
+    return insights || [];
+  } catch (err) {
+    console.error("fetchWalletsFallback error:", err);
+    return [];
+  }
 }
 
 function getSupabaseClient() {
@@ -119,7 +140,12 @@ export async function GET() {
 
   if (!data || data.length === 0) {
     const fallback = await fetchSmartMoneyFallback();
-    return NextResponse.json(fallback);
+    if (fallback.length > 0) {
+      return NextResponse.json(fallback);
+    }
+    
+    const walletInsights = await fetchWalletsFallback();
+    return NextResponse.json(walletInsights);
   }
 
   return NextResponse.json(data);

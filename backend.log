@@ -1,0 +1,32 @@
+[index] Smart Wallet Signal Feed starting...
+[index] API server listening on 3001
+[index] Hydrated 18 wallets from Supabase
+[index] Hydrated 18 last-seen markers from Supabase
+[wallets] Refreshing top wallet list...
+[wallets] Failed to fetch wallets at offset 0: { success: false, message: 'Compute units usage limit exceeded' }
+[wallets] Failed to fetch wallets at offset 10: { success: false, message: 'Compute units usage limit exceeded' }
+[wallets] Wallet refresh returned empty; keeping existing list
+[insights] Generated 5 AI insights
+[telegram] Startup message sent
+[index] Checking 18 wallets for new swaps...
+[monitor] Failed to fetch swaps for AHdUMwfSsmdoFhq84XQVqnNhUU3iyN2hokkz6pFtqMnj: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for 2UAeWoJ9ZTv6KDk1j8kNmRsG3yKq4cGSdip459GMR6Ho: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for HkFGQsW8mr8DTC2AE2WcC7MzwSnynfEryGMQSht271nf: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for GFHMc9BegxJXLdHJrABxNVoPRdnmVxXiNeoUCEpgXVHw: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for 6UwqihqyVb6pYZXZnpGwEF7a4etyR4ijpYjR7RJwn77b: 
+[monitor] Failed to fetch swaps for EG8XbqqyNmBLHMP2Y2wyPbMX8c6J12YG8KM4GmvWvUeV: 
+[monitor] Failed to fetch swaps for 7AuXsmFSafgNSH7cG9QASAZctc612JVvasp379sX6cqD: 
+[monitor] Failed to fetch swaps for 973vghafz4fQYB3MquWdLZd8dBMzJWcsTyBxH2GAMqcY: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for JD38n7ynKYcgPpF7k1BhXEeREu1KqptU93fVGy3S624k: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for DQ98rFpF68F7D9JZP6uubJzjw2NAtrRq955eGzfb6K6x: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for 6k64Wxj9LAYJ2zZ6YY1MKtmpeuBW3bcVqyRigYX1nU2x: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for JD25qVdtd65FoiXNmR89JjmoJdYk9sjYQeSTZAALFiMy: socket hang up
+[monitor] Failed to fetch swaps for 31o3cjq1yr2ssTrAvXHEGa5MUPbViDQChocmwoL8ptWc: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for Euu7J5JWmvoF4vZ5M2X583jx8c9MgES58xW9SBFKziqq: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for 7bL6uz3PYJSsb6ndZHhnRheaaxkHBqhRDr513tswFNnA: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for HFvU7JH5GbWSASkdjrjhtbKKyG2bpx9Rh8ZfNH8PiciX: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for 2JEMqNZPs7fYaajprqXBY8BVp9g6crh6a2aGggscanLU: { success: false, message: 'Compute units usage limit exceeded' }
+[monitor] Failed to fetch swaps for E4MBsUp7PndXTiv9sQFZxZZogbb7pokEkyn71H8fZTtC: { success: false, message: 'Compute units usage limit exceeded' }
+[smart-money] Failed to fetch smart-money tokens: { success: false, message: 'Compute units usage limit exceeded' }
+[index] No smart-money signals returned
+[index] Cron jobs scheduled. Bot is running.

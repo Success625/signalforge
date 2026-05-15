@@ -1,18 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import { z } from "zod";
-import {
-  BarChart3,
-  Filter,
-  Flame,
-  Menu,
-  navIcons,
-  RefreshCw,
-  Users,
-} from "./icons";
-import { headerMetrics, primaryNavItems, utilityNavItems } from "./mock-data";
+import { BarChart3, Filter, Flame, RefreshCw, Users } from "./icons";
 import { SignalCard } from "./signal-card";
 import { WalletCard } from "./wallet-card";
 import type { SignalCardItem, WalletItem } from "./types";
@@ -20,8 +10,8 @@ import type { SignalCardItem, WalletItem } from "./types";
 const walletResponseSchema = z.array(
   z.object({
     address: z.string(),
-    pnl: z.number().nullable().optional(),
-    tradeCount: z.number().nullable().optional(),
+    pnl: z.union([z.number(), z.string()]).nullable().optional(),
+    tradeCount: z.union([z.number(), z.string()]).nullable().optional(),
   }),
 );
 
@@ -153,133 +143,6 @@ function getPnlClassName(pnl: number) {
   return "text-on-surface";
 }
 
-type HeaderProps = {
-  isSidebarOpen: boolean;
-  onToggleSidebar: () => void;
-};
-
-function Header({ isSidebarOpen, onToggleSidebar }: HeaderProps) {
-  return (
-    <header className="fixed top-0 left-0 w-full z-50 min-h-16 flex flex-col gap-4 px-4 pt-3 pb-2 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:px-6 bg-surface-container-low/95 backdrop-blur-md border-b border-outline-variant">
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          aria-expanded={isSidebarOpen}
-          aria-label="Toggle navigation"
-          className="lg:hidden flex items-center justify-center w-9 h-9 rounded-md border border-outline-variant text-on-surface-variant hover:text-primary-container hover:border-primary-container/50 transition-colors"
-          onClick={onToggleSidebar}
-          type="button"
-        >
-          <Menu size={20} strokeWidth={1.75} />
-        </button>
-        <div className="w-8 h-8 rounded-md border border-outline-variant bg-surface-container-highest flex items-center justify-center overflow-hidden">
-          <Image
-            alt="SignalForge logo"
-            src="/logo.png"
-            width={32}
-            height={32}
-          />
-        </div>
-        <h1 className="font-display-lg text-[18px] sm:text-display-lg text-primary-container tracking-tighter uppercase leading-tight">
-          SIGNALFORGE
-        </h1>
-        <div className="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full border border-outline-variant">
-          <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse-dot" />
-          <span className="font-label-md text-label-md text-primary-container">
-            LIVE
-          </span>
-        </div>
-      </div>
-      <div className="hidden lg:flex items-center gap-8">
-        {headerMetrics.map((metric, index) => (
-          <div
-            key={metric.label}
-            className={
-              index === 0
-                ? "flex flex-col items-end"
-                : "flex flex-col items-end border-l border-outline-variant pl-8"
-            }
-          >
-            <span className="font-label-md text-[10px] text-on-surface-variant uppercase">
-              {metric.label}
-            </span>
-            <span
-              className={`font-data-md text-data-md text-on-surface ${metric.valueClassName ?? ""}`}
-            >
-              {metric.value}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-4" />
-    </header>
-  );
-}
-
-type SidebarProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
-
-function Sidebar({ isOpen, onClose }: SidebarProps) {
-  return (
-    <>
-      <div
-        className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden ${
-          isOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        onClick={onClose}
-      />
-      <nav
-        className={`fixed left-0 top-16 h-[calc(100vh-64px)] w-64 z-50 flex flex-col justify-between border-r border-outline-variant bg-surface-container-lowest transform transition-transform duration-300 lg:z-40 lg:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col">
-          <div className="py-4">
-            {primaryNavItems.map((item) => {
-              const Icon = navIcons[item.icon];
-
-              return (
-                <a
-                  key={item.label}
-                  className={
-                    item.active
-                      ? "bg-surface-container-high text-primary-container border-l-2 border-primary-container flex items-center gap-3 px-4 py-3"
-                      : "text-on-surface-variant flex items-center gap-3 px-4 py-3 hover:bg-surface-container transition-all duration-200"
-                  }
-                  href={item.href}
-                >
-                  <Icon size={18} strokeWidth={1.75} />
-                  <span className="font-label-md text-label-md">
-                    {item.label}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-        <div className="p-4 border-t border-outline-variant flex flex-col gap-1">
-          {utilityNavItems.map((item) => {
-            const Icon = navIcons[item.icon];
-
-            return (
-              <a
-                key={item.label}
-                className="text-on-surface-variant flex items-center gap-3 px-4 py-2 hover:text-on-surface text-sm"
-                href={item.href}
-              >
-                <Icon size={14} strokeWidth={1.75} />
-                <span className="font-label-md text-label-md">
-                  {item.label}
-                </span>
-              </a>
-            );
-          })}
-        </div>
-      </nav>
-    </>
-  );
-}
 
 type TrackedWalletsPanelProps = {
   activeWalletAddress: string;
@@ -611,7 +474,6 @@ function IntelligenceSummaryPanel({
 }
 
 export function SignalFeedDashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [wallets, setWallets] = useState<WalletItem[]>([]);
   const [activeWalletAddress, setActiveWalletAddress] = useState("");
   const [walletsError, setWalletsError] = useState<string | null>(null);
@@ -643,12 +505,13 @@ export function SignalFeedDashboard() {
 
       const nextWallets = parsed.data.map((wallet, index) => ({
         address: wallet.address,
-        pnlUsd: formatPnlUsd(wallet.pnl),
-        tradeCount: wallet.tradeCount ?? undefined,
+        pnlUsd: formatPnlUsd(parseNumeric(wallet.pnl)),
+        tradeCount: parseNumeric(wallet.tradeCount) ?? undefined,
         isPremium: index === 0,
       }));
 
       const ranked = parsed.data
+        .map((wallet) => ({ ...wallet, pnl: parseNumeric(wallet.pnl) }))
         .filter((wallet) => typeof wallet.pnl === "number")
         .sort((a, b) => (b.pnl ?? 0) - (a.pnl ?? 0))
         .slice(0, 3)
@@ -718,17 +581,17 @@ export function SignalFeedDashboard() {
           tokenSymbol,
           tokenAddress: row.token_address ?? undefined,
           volumeUsd,
-          actionLabel: smartMoneyStyle ? "Smart Money Flow" : "Buy Signal",
+          actionLabel: sourceRaw === "ai_insight" ? "Wallet Insight" : (smartMoneyStyle ? "Smart Money Flow" : "Buy Signal"),
           explanation: row.explanation ?? "Signal detected.",
-          source: smartMoneyStyle ? "smart_money" : "ai",
+          source: sourceRaw === "ai_insight" ? "ai_insight" : (smartMoneyStyle ? "smart_money" : "ai"),
           timestampLabel: formatRelativeTime(timestampSeconds ?? undefined),
           wallet: row.wallet ?? (smartMoneyStyle ? "smart-money" : "unknown"),
-          severityLabel: smartMoneyMeta
+          severityLabel: sourceRaw === "ai_insight" ? "Impact: High" : (smartMoneyMeta
             ? smartMoneyMeta.severityLabel
-            : getImpactLabel(volumeUsd),
-          isSafe: smartMoneyMeta ? smartMoneyMeta.isSafe : true,
-          isBlocked: smartMoneyMeta ? smartMoneyMeta.isBlocked : false,
-          isCaution: smartMoneyMeta ? smartMoneyMeta.isCaution : false,
+            : getImpactLabel(volumeUsd)),
+          isSafe: sourceRaw === "ai_insight" ? true : (smartMoneyMeta ? smartMoneyMeta.isSafe : true),
+          isBlocked: sourceRaw === "ai_insight" ? false : (smartMoneyMeta ? smartMoneyMeta.isBlocked : false),
+          isCaution: sourceRaw === "ai_insight" ? false : (smartMoneyMeta ? smartMoneyMeta.isCaution : false),
         } as SignalCardItem;
       });
 
@@ -760,33 +623,25 @@ export function SignalFeedDashboard() {
   }, [fetchSignals]);
 
   return (
-    <div className="bg-background text-on-surface font-body-md overflow-hidden min-h-screen">
-      <div className="scanline-overlay" />
-      <Header
-        isSidebarOpen={isSidebarOpen}
-        onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
+    <div className="flex flex-col lg:flex-row gap-0 h-full w-full">
+      <TrackedWalletsPanel
+        activeWalletAddress={activeWalletAddress}
+        wallets={wallets}
+        isLoading={isWalletsLoading}
+        errorMessage={walletsError}
+        onSelectWallet={setActiveWalletAddress}
+        onRetry={fetchWallets}
       />
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="ml-0 lg:ml-64 mt-16 h-[calc(100vh-64px)] overflow-y-auto lg:overflow-hidden flex flex-col lg:flex-row gap-0">
-        <TrackedWalletsPanel
-          activeWalletAddress={activeWalletAddress}
-          wallets={wallets}
-          isLoading={isWalletsLoading}
-          errorMessage={walletsError}
-          onSelectWallet={setActiveWalletAddress}
-          onRetry={fetchWallets}
-        />
-        <LiveSignalFeedPanel
-          signals={signals}
-          isLoading={isSignalsLoading}
-          errorMessage={signalsError}
-          onRefresh={fetchSignals}
-        />
-        <IntelligenceSummaryPanel
-          topPerformers={topPerformers}
-          isLoading={isWalletsLoading}
-        />
-      </main>
+      <LiveSignalFeedPanel
+        signals={signals}
+        isLoading={isSignalsLoading}
+        errorMessage={signalsError}
+        onRefresh={fetchSignals}
+      />
+      <IntelligenceSummaryPanel
+        topPerformers={topPerformers}
+        isLoading={isWalletsLoading}
+      />
     </div>
   );
 }
