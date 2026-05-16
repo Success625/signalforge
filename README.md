@@ -70,7 +70,7 @@ This project heavily leverages the Birdeye Data API to surface real-time, action
 1. Clone the repository and navigate to the project directory:
 
    ```bash
-   git clone <repository-url> signalforge
+   git clone https://github.com/Success625/signalforge.git
    cd signalforge
    ```
 
