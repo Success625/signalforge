@@ -59,17 +59,27 @@ export async function sendLeaderboard(wallets) {
       return;
     }
 
+    const medals = ["🥇", "🥈", "🥉"];
     const lines = roster.map((wallet, index) => {
       const shortWallet = `${wallet.address.slice(0, 4)}...${wallet.address.slice(-4)}`;
       const profileLink = `https://birdeye.so/profile/${wallet.address}?chain=solana`;
-      const pnlLabel = formatPnl(wallet.pnl);
+      
+      const numericPnl = Number(wallet.pnl ?? 0);
+      const absValue = Math.abs(numericPnl);
+      const formatted = `$${Math.round(absValue).toLocaleString()}`;
+      const pnlLabel = numericPnl < 0 ? `-${formatted}` : `+${formatted}`;
 
-      return `> *${index + 1}.* [${shortWallet}](${profileLink}) — *PnL:* ${pnlLabel} — [Trades](${profileLink})`;
+      const medal = medals[index] || "🏅";
+
+      return `${medal} [${shortWallet}](${profileLink})\n└ *PnL:* ${pnlLabel} | [View Trades](${profileLink})`;
     });
 
-    const text = `📌 *Roster Update*
-> Top 3 wallets by weekly PnL
-${lines.join("\n")}`;
+    const text = `🚀 *SignalForge Roster Update*
+_Top 3 Smart Wallets by Weekly PnL_
+
+${lines.join("\n\n")}
+
+🌐 *[View Live Dashboard](https://signalforgeapp.vercel.app/)* | 🤖 *AI Intelligence*`;
 
     await axios.post(`${TELEGRAM_API}/sendMessage`, {
       chat_id: process.env.TELEGRAM_CHAT_ID,

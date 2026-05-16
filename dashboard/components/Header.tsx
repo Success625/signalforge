@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Menu } from "./signal-feed/icons";
-import { headerMetrics } from "./signal-feed/mock-data";
+import { useDashboard } from "./DashboardContext";
 
 type HeaderProps = {
   isSidebarOpen: boolean;
@@ -10,6 +10,17 @@ type HeaderProps = {
 };
 
 export function Header({ isSidebarOpen, onToggleSidebar }: HeaderProps) {
+  const { signals, wallets } = useDashboard();
+
+  const unsafeBlockedCount = signals.filter((s) => s.isBlocked).length;
+  
+  const metrics = [
+    { label: "SIGNALS TODAY", value: signals.length.toString() },
+    { label: "WALLETS TRACKED", value: wallets.length.toString() },
+    { label: "UNSAFE BLOCKED", value: unsafeBlockedCount.toString(), valueClassName: "text-error" },
+    { label: "UPTIME", value: "99.9%", valueClassName: "text-primary-container" },
+  ];
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 min-h-16 flex flex-col gap-4 px-4 pt-3 pb-2 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:px-6 bg-surface-container-low/95 backdrop-blur-md border-b border-outline-variant">
       <div className="flex flex-wrap items-center gap-3">
@@ -41,7 +52,7 @@ export function Header({ isSidebarOpen, onToggleSidebar }: HeaderProps) {
         </div>
       </div>
       <div className="hidden lg:flex items-center gap-8">
-        {headerMetrics.map((metric, index) => (
+        {metrics.map((metric, index) => (
           <div
             key={metric.label}
             className={
