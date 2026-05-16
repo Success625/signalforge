@@ -13,21 +13,22 @@
 - **@google/generative-ai** - For the AI Insight Layer
 - **axios** - For API and data fetching
 - **node-cron** - Task scheduling
-- _Coming soon: Next.js (Dashboard frontend) and Hono (Edge/Backend server)_
+- **Next.js** - Dashboard frontend
+- **Drizzle ORM & Postgres** - Database management
 
 ## Key Features
 
 1.  **Smart Money Feed:** Profitable wallets buying, token accumulation activity, and whale entries.
 2.  **Narrative Detection:** Tracks trending sectors, AI meme coins, ecosystem momentum, and capital rotation.
 3.  **AI Insight Layer:** Converts raw data into readable explanations, risk summaries, and conviction scores.
-4.  **Signal Dashboard (Upcoming):** Displays top opportunities, momentum score, risk score, and smart money score.
+4.  **Signal Dashboard:** Displays top opportunities, momentum score, risk score, and smart money score.
 5.  **Telegram Alert Bot:** Sends formatted alerts automatically to a public Telegram channel.
 
 ## Architecture & Technical Depth
 
 SignalForge runs as a resilient Node.js background process:
 
-- **State Management:** Uses **Supabase** to hydrate wallet states and `lastSeenTime` markers on boot, ensuring no signals are missed if the bot restarts.
+- **State Management:** Uses **Supabase (Postgres)** via **Drizzle ORM** to hydrate wallet states and `lastSeenTime` markers on boot, ensuring no signals are missed if the bot restarts.
 - **Rate Limit Handling:** Implements an intelligent `withRetry429` exponential backoff wrapper around Birdeye API calls to respect rate limits during high-concurrency wallet scanning.
 - **Pipeline:**
   1. **Cron 1 (6h):** Retrieves/refreshes historically profitable wallets.
@@ -35,7 +36,7 @@ SignalForge runs as a resilient Node.js background process:
   3. **Safety Layer:** Filters stablecoins, assesses token concentration (`scoreToken`), and drops low-volume noise.
   4. **AI Insight Layer:** Feeds the curated swap into Gemini 2.0 Flash to synthesize a narrative-driven conviction alert.
 
-_Note: Future architecture will incorporate a Hono API and a Next.js frontend to visualize the signals in real-time._
+_Note: The architecture incorporates a Next.js frontend to visualize the signals in real-time._
 
 ## 🦅 Birdeye API Integration
 
@@ -52,6 +53,8 @@ This project heavily leverages the Birdeye Data API to surface real-time, action
 ├── signal.js     # Processes raw swap data through the AI generation layer
 ├── telegram.js   # Telegram bot formatting and dispatching
 ├── wallets.js    # Handles wallet list refreshing and tracking logic
+├── dashboard/    # Next.js frontend dashboard application
+├── db/           # Drizzle ORM schema and database setup
 └── package.json  # NPM scripts and dependencies
 ```
 
@@ -96,7 +99,8 @@ This project heavily leverages the Birdeye Data API to surface real-time, action
 - [Birdeye Data API](https://bds.birdeye.so) — onchain data infrastructure
 - [Google Gemini](https://aistudio.google.com/) — AI signal explanation
 - [Telegram Bot API](https://core.telegram.org/bots/api) — signal delivery
-- [Railway](https://railway.app) — free hosting
+- [Railway](https://railway.app) — backend hosting
+- [Vercel](https://vercel.com) — frontend hosting
 
 ---
 

@@ -22,7 +22,7 @@
 
 The dashboard serves as the visual presentation layer for the SignalForge ecosystem. It evaluates state and interacts with the APIs to retrieve:
 
-- Top wallet opportunities
+- Top wallet opportunities (synced via Supabase)
 - Narrative momentum and capital rotation tracking
 - Risk summaries (holder concentration) and conviction scores synthesized by the AI Insight Layer.
 
@@ -71,7 +71,7 @@ dashboard/
 
 ## Development Workflow
 
-Active development takes place within the Next.js `app` folder, following standard component-driven design patterns. The project utilizes pnpm workspaces from the root to manage dependencies efficiently across both backend (SignalForge Node.js process) and frontend.
+Active development takes place within the Next.js `app` folder, following standard component-driven design patterns. The frontend is deployed on Vercel and communicates with the backend hosted on Railway, utilizing Supabase for persistent data storage like tracked wallets.
 
 ## Coding Standards
 
