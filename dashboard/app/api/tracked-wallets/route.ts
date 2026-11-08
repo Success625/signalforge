@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 
-const UPSTREAM_TIMEOUT_MS = 4000;
+const UPSTREAM_TIMEOUT_MS = 2000;
 
 type TrackedWallet = {
   address: string;

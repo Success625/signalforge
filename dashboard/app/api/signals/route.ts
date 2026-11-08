@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 
 const BIRDEYE_BASE_URL = "https://public-api.birdeye.so";
-const UPSTREAM_TIMEOUT_MS = 4000;
+const UPSTREAM_TIMEOUT_MS = 2000;
 const NO_STORE_HEADERS = { "Cache-Control": "no-store" };
 
 function jsonResponse(payload: unknown) {
@@ -149,11 +149,10 @@ export async function GET() {
     }
   }
 
-  const fallback = await fetchSmartMoneyFallback();
-  if (fallback.length > 0) {
-    return jsonResponse(fallback);
-  }
+  const [fallback, walletInsights] = await Promise.all([
+    fetchSmartMoneyFallback(),
+    fetchWalletsFallback(),
+  ]);
 
-  const walletInsights = await fetchWalletsFallback();
-  return jsonResponse(walletInsights);
+  return jsonResponse(fallback.length > 0 ? fallback : walletInsights);
 }
