@@ -110,9 +110,9 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setWalletsError(null);
 
     try {
-      const apiBaseUrl =
-        process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-      const response = await fetch(`${apiBaseUrl}/api/tracked-wallets`);
+      const response = await fetch("/api/tracked-wallets", {
+        cache: "no-store",
+      });
 
       if (!response.ok) {
         throw new Error(`Wallet fetch failed (${response.status})`);
@@ -218,6 +218,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Initial load and polling; the loading transitions are intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchWallets();
     fetchSignals();
     

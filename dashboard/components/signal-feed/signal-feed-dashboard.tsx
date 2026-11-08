@@ -61,7 +61,7 @@ function TrackedWalletsPanel({
             )}
           </div>
         ) : wallets.length === 0 ? (
-          <div className="text-xs text-on-surface-variant">No tracked wallets available yet.</div>
+          <div className="text-xs text-on-surface-variant">No wallets tracked yet.</div>
         ) : (
           wallets.map((wallet) => (
             <WalletCard
@@ -125,7 +125,7 @@ function LiveSignalFeedPanel({
             </button>
           </div>
         ) : signals.length === 0 ? (
-          <div className="text-xs text-on-surface-variant">No signals available yet.</div>
+          <div className="text-xs text-on-surface-variant">No signals yet.</div>
         ) : (
           signals.map((signal, index) => (
             <SignalCard
@@ -286,7 +286,9 @@ function IntelligenceSummaryPanel({
           </div>
           <div className="flex items-end gap-2 mb-1">
             <span className="font-display-lg text-xl">{hottestTokenSymbol}</span>
-            <span className="font-data-sm text-primary-container pb-1">+ Live</span>
+            <span className="font-data-sm text-primary-container pb-1">
+              {signals.length > 0 ? "+ Live" : "No live signals"}
+            </span>
           </div>
           <div className="font-data-sm text-on-surface-variant text-[11px] mb-3">
             Vol: ${Math.round(hottestVolume).toLocaleString()}

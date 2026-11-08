@@ -1,7 +1,16 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseClient } from "@/lib/supabase";
 
 const BIRDEYE_BASE_URL = "https://public-api.birdeye.so";
+const UPSTREAM_TIMEOUT_MS = 4000;
+const NO_STORE_HEADERS = { "Cache-Control": "no-store" };
+
+function jsonResponse(payload: unknown) {
+  return NextResponse.json(payload, {
+    status: 200,
+    headers: NO_STORE_HEADERS,
+  });
+}
 
 function getBirdeyeHeaders() {
   const apiKey = process.env.BIRDEYE_API_KEY;
@@ -44,7 +53,11 @@ async function fetchSmartMoneyFallback() {
   url.searchParams.set("limit", "10");
 
   try {
-    const response = await fetch(url.toString(), { headers, cache: "no-store" });
+    const response = await fetch(url.toString(), {
+      headers,
+      cache: "no-store",
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
 
     if (!response.ok) {
       return [];
@@ -91,62 +104,56 @@ async function fetchSmartMoneyFallback() {
 
 async function fetchWalletsFallback() {
   try {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-    const response = await fetch(`${apiBaseUrl}/api/wallet-insights`, { cache: "no-store" });
+    const apiBaseUrl =
+      process.env.API_BASE_URL ??
+      process.env.NEXT_PUBLIC_API_BASE_URL ??
+      "http://localhost:3001";
+    const response = await fetch(
+      `${apiBaseUrl.replace(/\/+$/, "")}/api/wallet-insights`,
+      {
+        cache: "no-store",
+        signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+      },
+    );
     if (!response.ok) return [];
-    
+
     const insights = await response.json();
-    return insights || [];
+    return Array.isArray(insights) ? insights : [];
   } catch (err) {
     console.error("fetchWalletsFallback error:", err);
     return [];
   }
 }
 
-function getSupabaseClient() {
-  const supabaseUrl =
-    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseKey);
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const client = getSupabaseClient();
 
-  if (!client) {
-    return NextResponse.json(
-      { error: "Missing Supabase configuration" },
-      { status: 500 },
-    );
-  }
+  if (client) {
+    try {
+      const { data, error } = await client
+        .from("signals")
+        .select(
+          "wallet,token_symbol,token_address,volume_usd,tx_hash,source,timestamp,explanation,created_at",
+        )
+        .order("created_at", { ascending: false })
+        .limit(20)
+        .abortSignal(AbortSignal.timeout(UPSTREAM_TIMEOUT_MS));
 
-  const { data, error } = await client
-    .from("signals")
-    .select(
-      "wallet,token_symbol,token_address,volume_usd,tx_hash,source,timestamp,explanation,created_at",
-    )
-    .order("created_at", { ascending: false })
-    .limit(20);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  if (!data || data.length === 0) {
-    const fallback = await fetchSmartMoneyFallback();
-    if (fallback.length > 0) {
-      return NextResponse.json(fallback);
+      if (!error && data && data.length > 0) {
+        return jsonResponse(data);
+      }
+    } catch {
+      // Fall through to the optional live-data fallbacks.
     }
-    
-    const walletInsights = await fetchWalletsFallback();
-    return NextResponse.json(walletInsights);
   }
 
-  return NextResponse.json(data);
+  const fallback = await fetchSmartMoneyFallback();
+  if (fallback.length > 0) {
+    return jsonResponse(fallback);
+  }
+
+  const walletInsights = await fetchWalletsFallback();
+  return jsonResponse(walletInsights);
 }
